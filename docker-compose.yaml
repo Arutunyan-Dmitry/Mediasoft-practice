@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  db-social-net:
+    image: postgres:12
+    container_name: db-social-net
+    volumes:
+    - ./postgres/data:/var/lib/postgresql/data
+    env_file:
+      - .env
+    restart: always
+  
+  app-social-net:
+    build:
+      context: ./socialnet
+      dockerfile: ./Dockerfile
+    container_name: app-social-net
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db-social-net
+    env_file:
+      - .env
+    command: bash -c "python manage.py migrate && python manage.py test content.tests && python manage.py runserver 0.0.0.0:8000"
+    restart: always
+
